@@ -1,18 +1,38 @@
-const UtilityHandler = require("./utilityHandler");
+const creteInteractionHandler = require("./createInteractionHandler");
+const { Client } = require("discord.js");
+const geminiChatbot = require("../api/gemini");
+
 module.exports = (client) => {
-  client.on("ready", (client) => {
-    console.log(`Login as a ${client.user.tag}`);
-  });
+  try {
+    client.on("ready", () => {
+      console.log(`Login as a ${client.user.tag}`);
+    });
 
-  client.on("interactionCreate", UtilityHandler.createInteraction);
+    client.on("messageCreate", async (message) => {
+      if (message.author.bot) return;
+      const prompt = message.content;
+      const conversationLog = [];
+      const prevMessages = await message.channel.messages.fetch({ limit: 15 });
+      prevMessages.reverse();
 
-  client.on("messageCreate", (message) => {
-    if (message.author.bot) return;
+      prevMessages.forEach((msg) => {
+        if (msg.author.id !== client.user.id && message.author.bot) return;
+        if (msg.author.id !== message.author.id) return;
+        conversationLog.push({
+          role: "user",
+          parts: [{ text: prompt }],
+        });
+      });
+      const res = await geminiChatbot(conversationLog, prompt);
+      return message.reply(res);
+    });
 
-    message.reply("Helz");
-  });
+    client.on("interactionCreate", creteInteractionHandler);
 
-  client.on("channelCreate", (channel) => {
-    console.log(`Channel with name ${channel.name} created`);
-  });
+    client.on("channelCreate", (channel) => {
+      console.log(`Channel with name ${channel.name} created`);
+    });
+  } catch (err) {
+    throw err;
+  }
 };

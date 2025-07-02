@@ -3,17 +3,26 @@ const { Client, IntentsBitField, REST, Routes } = require("discord.js");
 const orderCommand = require("./commands/utility/order");
 const commandHandler = require("./events/handler");
 const lovePercentageCommand = require("./commands/utility/lovePercentage");
-const UtilityHandler = require("./events/utilityHandler");
+const optionTestCommand = require("./commands//fun/optionTest");
+const joinVcCommand = require("./commands/fun/join");
+const geminiCommand = require("./commands/fun/gemini");
 
 require("dotenv").config();
 const { TOKEN, CLIENT_ID, GUILD_ID } = process.env;
 
-const commands = [orderCommand, lovePercentageCommand];
+const commands = [
+  orderCommand,
+  lovePercentageCommand,
+  optionTestCommand,
+  joinVcCommand,
+  geminiCommand,
+];
 const client = new Client({
   intents: [
     IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.MessageContent,
     IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.Guilds,
   ],
 });
@@ -27,9 +36,8 @@ const client = new Client({
     console.log("Commands register Success");
 
     client.login(TOKEN);
+    commandHandler(client);
   } catch (err) {
-    console.log(`Commands register failed: ${err}`);
+    console.log(`Commands register failed:`);
   }
 })();
-
-commandHandler(client);
