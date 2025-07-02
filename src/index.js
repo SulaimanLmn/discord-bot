@@ -10,13 +10,7 @@ const geminiCommand = require("./commands/fun/gemini");
 require("dotenv").config();
 const { TOKEN, CLIENT_ID, GUILD_ID } = process.env;
 
-const commands = [
-  orderCommand,
-  lovePercentageCommand,
-  optionTestCommand,
-  joinVcCommand,
-  geminiCommand,
-];
+const commands = [lovePercentageCommand, joinVcCommand];
 const client = new Client({
   intents: [
     IntentsBitField.Flags.GuildMembers,
@@ -38,6 +32,6 @@ const client = new Client({
     client.login(TOKEN);
     commandHandler(client);
   } catch (err) {
-    console.log(`Commands register failed:`);
+    console.log(`Commands register failed:${err}`);
   }
 })();

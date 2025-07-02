@@ -13,8 +13,8 @@ module.exports = async (interaction) => {
   try {
     if (!interaction.isChatInputCommand()) return;
 
-    if (interaction.commandName === "chatbot")
-      return await chatbotHandler(interaction);
+    // if (interaction.commandName === "chatbot")
+    //   return await chatbotHandler(interaction);
 
     if (interaction.commandName === "join-vc")
       return joinVcHandler(interaction);
