@@ -17,7 +17,6 @@ module.exports = async function (prompt) {
       },
     });
     for (const part of response.candidates[0].content.parts) {
-      // Based on the part type, either show the text or save the image
       if (part.text) {
         console.log(part.text);
       } else if (part.inlineData) {

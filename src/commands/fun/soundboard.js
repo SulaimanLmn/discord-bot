@@ -1,11 +1,11 @@
 const { SlashCommandBuilder, ChannelType } = require("discord.js");
 
 module.exports = new SlashCommandBuilder()
-  .setName("join-vc")
+  .setName("soundboards")
   .setDescription("Make the bot joining vc and play a fucking soundboard")
   .addChannelOption((channel) =>
     channel
-      .setName("vc-name")
+      .setName("vc")
       .setDescription("Pick vc you want the bot to join")
       .setRequired(true)
       .addChannelTypes(ChannelType.GuildVoice)

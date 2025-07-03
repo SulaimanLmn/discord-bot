@@ -4,13 +4,14 @@ const orderCommand = require("./commands/utility/order");
 const commandHandler = require("./events/handler");
 const lovePercentageCommand = require("./commands/utility/lovePercentage");
 const optionTestCommand = require("./commands//fun/optionTest");
-const joinVcCommand = require("./commands/fun/join");
+const joinVcCommand = require("./commands/fun/soundboard");
 const geminiCommand = require("./commands/fun/gemini");
+const geminiTtsCommand = require("./commands/fun/geminiTTS");
 
 require("dotenv").config();
 const { TOKEN, CLIENT_ID, GUILD_ID } = process.env;
 
-const commands = [lovePercentageCommand, joinVcCommand];
+const commands = [lovePercentageCommand, joinVcCommand, geminiTtsCommand];
 const client = new Client({
   intents: [
     IntentsBitField.Flags.GuildMembers,

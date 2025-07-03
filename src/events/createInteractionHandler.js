@@ -3,11 +3,14 @@ const {
   createAudioPlayer,
   createAudioResource,
   AudioPlayerStatus,
+  StreamType,
 } = require("@discordjs/voice");
 const fs = require("fs");
 const path = require("path");
 const { MessageFlags, AttachmentBuilder, messageLink } = require("discord.js");
-const geminiChatbot = require("../api/gemini");
+const geminiChatbot = require("../api/gemini-chatbot");
+const geminiTts = require("../api/gemini-tts");
+const { Readable } = require("stream");
 
 module.exports = async (interaction) => {
   try {
@@ -16,13 +19,16 @@ module.exports = async (interaction) => {
     // if (interaction.commandName === "chatbot")
     //   return await chatbotHandler(interaction);
 
-    if (interaction.commandName === "join-vc")
-      return joinVcHandler(interaction);
+    if (interaction.commandName === "text-to-speech") {
+      ttsChatbotHandler(interaction);
+    }
+    if (interaction.commandName === "soundboards")
+      return soundboardHandler(interaction);
 
     if (interaction.commandName === "love-percentage")
       return lovePercentageHandler(interaction);
   } catch (err) {
-    return interaction.reply("Some error occur");
+    return interaction.reply(err);
   }
 };
 
@@ -57,11 +63,11 @@ const chatbotHandler = async (interaction) => {
   }
 };
 
-const joinVcHandler = async (interaction) => {
+const soundboardHandler = async (interaction) => {
   try {
     const voiceConnection = joinVoiceChannel({
       guildId: interaction.guildId,
-      channelId: interaction.options.getChannel("vc-name").id,
+      channelId: interaction.options.getChannel("vc").id,
       adapterCreator: interaction.guild.voiceAdapterCreator,
     });
     const soundboard = interaction.options.getString("soundboard");
@@ -108,5 +114,44 @@ const lovePercentageHandler = async () => {
     interaction.reply(`${crush} loves you ${percentage}% ❤️`);
   } catch (err) {
     console.log(`love percentage error ${err}`);
+  }
+};
+
+const ttsChatbotHandler = async (interaction) => {
+  const prompt = interaction.options.getString("prompt");
+  const vc = interaction.options.getChannel("vc");
+  const userId = interaction.user.id;
+
+  await interaction.deferReply();
+
+  try {
+    const result = await geminiChatbot(userId, prompt);
+    const wavStream = await geminiTts(result);
+
+    await interaction.editReply(result);
+
+    const connection = joinVoiceChannel({
+      guildId: interaction.guild.id,
+      channelId: vc.id,
+      adapterCreator: interaction.guild.voiceAdapterCreator,
+    });
+
+    const resource = createAudioResource(wavStream, {
+      inputType: StreamType.Arbitrary,
+    });
+
+    const player = createAudioPlayer();
+    player.play(resource);
+    connection.subscribe(player);
+
+    player.on(AudioPlayerStatus.Idle, () => {
+      connection.destroy();
+    });
+  } catch (err) {
+    console.error("TTS error:", err);
+    await interaction.editReply({
+      content: "Bang udah bang. Kena limit",
+      flags: MessageFlags.Ephemeral,
+    });
   }
 };

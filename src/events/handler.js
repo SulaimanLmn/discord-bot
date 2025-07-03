@@ -1,6 +1,4 @@
 const creteInteractionHandler = require("./createInteractionHandler");
-const { Client, AttachmentBuilder } = require("discord.js");
-const geminiChatbot = require("../api/gemini");
 const messageCreateHandler = require("./messageCreateHandler");
 
 module.exports = (client) => {
