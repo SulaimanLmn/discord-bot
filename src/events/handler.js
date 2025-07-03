@@ -12,10 +12,6 @@ module.exports = (client) => {
     client.on("messageCreate", messageCreateHandler(client));
 
     client.on("interactionCreate", creteInteractionHandler);
-
-    // client.on("channelCreate", (channel) => {
-    //   console.log(`Channel with name ${channel.name} created`);
-    // });
   } catch (err) {
     throw err;
   }

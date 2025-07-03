@@ -3,6 +3,7 @@ require("dotenv").config();
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+// const userHistories = new Map();
 const chatSessions = new Map();
 
 module.exports = async (userId, prompt) => {
@@ -15,10 +16,28 @@ module.exports = async (userId, prompt) => {
       },
     });
     chatSessions.set(userId, chat);
+    // userHistories.set(userId, []);
   }
 
   const chat = chatSessions.get(userId);
-  console.log(chatSessions);
+  // const userHistory = userHistories.get(userId);
+
+  // userHistory.push({
+  //   role: "user",
+  //   parts: [{ text: prompt }],
+  // });
+
   const result = await chat.sendMessage({ message: prompt });
-  return result.text;
+  const reply = result.text;
+
+  // userHistory.push({
+  //   role: "model",
+  //   parts: [{ text: reply }],
+  // });
+
+  // if (userHistory.length > 20) {
+  //   userHistory.splice(0, userHistory.length - 20);
+  // }
+
+  return reply;
 };

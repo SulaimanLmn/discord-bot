@@ -2,7 +2,7 @@ const { SlashCommandBuilder, ChannelType } = require("discord.js");
 
 module.exports = new SlashCommandBuilder()
   .setName("join-vc")
-  .setDescription("Make the bot joining vc")
+  .setDescription("Make the bot joining vc and play a fucking soundboard")
   .addChannelOption((channel) =>
     channel
       .setName("vc-name")
@@ -22,6 +22,30 @@ module.exports = new SlashCommandBuilder()
         {
           name: "Bomboclat",
           value: "bomboclat",
+        },
+        {
+          name: "Kobo Jawa",
+          value: "kobo-jawa",
+        },
+        {
+          name: "Tuco get out cut off",
+          value: "tuco-get-out-cut-off",
+        },
+        {
+          name: "Patrick pembohong",
+          value: "patrick-pembohong",
+        },
+        {
+          name: "Hidup blonde",
+          value: "hidup-blonde",
+        },
+        {
+          name: "Bang kapan mainnya bang",
+          value: "bang-kapan-mainnya",
+        },
+        {
+          name: "Samlekom ireng",
+          value: "samlekom-ireng",
         },
       ])
       .setRequired(true)
