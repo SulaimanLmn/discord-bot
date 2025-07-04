@@ -19,9 +19,9 @@ module.exports = async (interaction) => {
     // if (interaction.commandName === "chatbot")
     //   return await chatbotHandler(interaction);
 
-    if (interaction.commandName === "text-to-speech") {
-      ttsChatbotHandler(interaction);
-    }
+    // if (interaction.commandName === "text-to-speech") {
+    //   // ttsChatbotHandler(interaction);
+    // }
     if (interaction.commandName === "soundboards")
       return soundboardHandler(interaction);
 
@@ -117,41 +117,4 @@ const lovePercentageHandler = async () => {
   }
 };
 
-const ttsChatbotHandler = async (interaction) => {
-  const prompt = interaction.options.getString("prompt");
-  const vc = interaction.options.getChannel("vc");
-  const userId = interaction.user.id;
-
-  await interaction.deferReply();
-
-  try {
-    const result = await geminiChatbot(userId, prompt);
-    const wavStream = await geminiTts(result);
-
-    await interaction.editReply(result);
-
-    const connection = joinVoiceChannel({
-      guildId: interaction.guild.id,
-      channelId: vc.id,
-      adapterCreator: interaction.guild.voiceAdapterCreator,
-    });
-
-    const resource = createAudioResource(wavStream, {
-      inputType: StreamType.Arbitrary,
-    });
-
-    const player = createAudioPlayer();
-    player.play(resource);
-    connection.subscribe(player);
-
-    player.on(AudioPlayerStatus.Idle, () => {
-      connection.destroy();
-    });
-  } catch (err) {
-    console.error("TTS error:", err);
-    await interaction.editReply({
-      content: "Bang udah bang. Kena limit",
-      flags: MessageFlags.Ephemeral,
-    });
-  }
-};
+// const ttsChatbotHandler = async (interaction) => {};

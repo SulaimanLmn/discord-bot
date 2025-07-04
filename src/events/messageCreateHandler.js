@@ -1,5 +1,7 @@
 const geminiChatbot = require("../api/gemini-chatbot");
 const { AttachmentBuilder } = require("discord.js");
+const { joinVoiceChannel } = require("@discordjs/voice");
+const geminiTts = require("../api/gemini-tts");
 const geminiGenerateImage = require("../api/gemini-image-generator");
 const geminiImageRecognition = require("../api/gemini-image-recognition");
 
@@ -14,6 +16,47 @@ module.exports = (client) => {
         const buffer = await geminiGenerateImage(prompt);
         const file = new AttachmentBuilder(buffer, { name: "image.png" });
         return message.reply({ files: [file] });
+      }
+
+      if (message.content.startsWith("!tts")) {
+        const prompt = message.content.replace("!tts", "").trim();
+        console.log(prompt);
+        const userChannel = message.member.voice.channel;
+        if (!userChannel)
+          return await message.reply(
+            "You must join a VC first before using this command. Dumbass"
+          );
+        const userId = message.author.id;
+        console.log(userId);
+
+        await message.channel.sendTyping();
+
+        try {
+          const result = await geminiChatbot(userId, prompt);
+          // const wavStream = await geminiTts(result);
+
+          const connection = joinVoiceChannel({
+            guildId: userChannel.guild.id,
+            channelId: userChannel.id,
+            adapterCreator: userChannel.guild.voiceAdapterCreator,
+          });
+
+          // const resource = createAudioResource(wavStream, {
+          //   inputType: StreamType.Arbitrary,
+          // });
+
+          // const player = createAudioPlayer();
+          // player.play(resource);
+          // connection.subscribe(player);
+
+          // player.on(AudioPlayerStatus.Idle, () => {
+          //   connection.destroy();
+          // });
+          return exceedCharacterLimitHandler(message, result);
+        } catch (err) {
+          console.log(err);
+          await message.reply("Bang udah bang. Kena limit");
+        }
       }
       if (!message.mentions.has(client.user)) return;
 

@@ -11,7 +11,7 @@ const geminiTtsCommand = require("./commands/fun/geminiTTS");
 require("dotenv").config();
 const { TOKEN, CLIENT_ID, GUILD_ID } = process.env;
 
-const commands = [lovePercentageCommand, joinVcCommand, geminiTtsCommand];
+const commands = [lovePercentageCommand, joinVcCommand];
 const client = new Client({
   intents: [
     IntentsBitField.Flags.GuildMembers,
