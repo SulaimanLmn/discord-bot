@@ -1,9 +1,17 @@
 const geminiChatbot = require("../api/gemini-chatbot");
 const { AttachmentBuilder } = require("discord.js");
-const { joinVoiceChannel } = require("@discordjs/voice");
+const {
+  joinVoiceChannel,
+  createAudioResource,
+  createAudioPlayer,
+  AudioPlayerStatus,
+  StreamType,
+} = require("@discordjs/voice");
 const geminiTts = require("../api/gemini-tts");
+const azureTts = require("../api/azure-tts");
 const geminiGenerateImage = require("../api/gemini-image-generator");
 const geminiImageRecognition = require("../api/gemini-image-recognition");
+const { createFFmpegStream } = require("../utils/ffmpegStream");
 
 module.exports = (client) => {
   return async (message) => {
@@ -20,20 +28,19 @@ module.exports = (client) => {
 
       if (message.content.startsWith("!tts")) {
         const prompt = message.content.replace("!tts", "").trim();
-        console.log(prompt);
         const userChannel = message.member.voice.channel;
         if (!userChannel)
           return await message.reply(
-            "You must join a VC first before using this command. Dumbass"
+            "You must join a VC first before using this command."
           );
-        const userId = message.author.id;
-        console.log(userId);
 
         await message.channel.sendTyping();
-
         try {
+          const userId = message.author.id;
           const result = await geminiChatbot(userId, prompt);
-          // const wavStream = await geminiTts(result);
+
+          const filePath = await azureTts(result);
+          const ffmpegStream = createFFmpegStream(filePath);
 
           const connection = joinVoiceChannel({
             guildId: userChannel.guild.id,
@@ -41,23 +48,25 @@ module.exports = (client) => {
             adapterCreator: userChannel.guild.voiceAdapterCreator,
           });
 
-          // const resource = createAudioResource(wavStream, {
-          //   inputType: StreamType.Arbitrary,
-          // });
+          const player = createAudioPlayer();
+          const resource = createAudioResource(ffmpegStream, {
+            inputType: StreamType.Raw,
+          });
 
-          // const player = createAudioPlayer();
-          // player.play(resource);
-          // connection.subscribe(player);
+          player.play(resource);
+          connection.subscribe(player);
 
-          // player.on(AudioPlayerStatus.Idle, () => {
-          //   connection.destroy();
-          // });
+          player.once(AudioPlayerStatus.Idle, () => {
+            connection.destroy();
+          });
+
           return exceedCharacterLimitHandler(message, result);
         } catch (err) {
-          console.log(err);
-          await message.reply("Bang udah bang. Kena limit");
+          console.error("TTS error:", err);
+          await message.reply("An error occurred during TTS playback.");
         }
       }
+
       if (!message.mentions.has(client.user)) return;
 
       const prompt = message.content.replace(`<@${client.user.id}>`, "").trim();
