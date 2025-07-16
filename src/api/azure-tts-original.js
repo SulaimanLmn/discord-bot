@@ -16,7 +16,7 @@ require("dotenv").config();
 // now create the audio-config pointing to our stream and
 // the speech config specifying the language.
 const { AZURE_KEY, AZURE_REGION } = process.env;
-var audioConfig = sdk.AudioConfig.fromAudioFileOutput(filename);
+var audioConfig = sdk.AudioConfig.fromAudioFileOutput("test-tts.wav");
 var speechConfig = sdk.SpeechConfig.fromSubscription(AZURE_KEY, AZURE_REGION);
 speechConfig.speechSynthesisVoiceName = "en-US-AshleyNeural";
 

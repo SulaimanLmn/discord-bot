@@ -21,16 +21,31 @@ module.exports = async function azureTts(text) {
     const synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
 
     const ssml = `
-      <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"
-             xmlns:mstts="http://www.w3.org/2001/mstts"
-             xml:lang="en-US">
-        <voice name="en-US-AshleyNeural">
-          <prosody pitch="+25%">
-            ${text}
+         <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"
+           xmlns:mstts="http://www.w3.org/2001/mstts"
+           xml:lang="en-US">
+      <voice name="en-US-AshleyNeural">
+        <mstts:express-as style="unfriendly" role="Girl">
+          <prosody pitch="+23%" contour="(0%, +0%) (100%, +0%)">
+           ${text}
           </prosody>
-        </voice>
-      </speak>
+        </mstts:express-as>
+      </voice>
+    </speak>
     `;
+
+    // untouch
+    //      <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"
+    //        xmlns:mstts="http://www.w3.org/2001/mstts"
+    //        xml:lang="en-US">
+    //   <voice name="en-US-AshleyNeural">
+    //     <mstts:express-as style="angry" styledegree="1.2">
+    //       <prosody pitch="+23%" contour="(0%, +0%) (100%, +0%)">
+    //         <say-as interpret-as="verbatim">${text}</say-as>
+    //       </prosody>
+    //     </mstts:express-as>
+    //   </voice>
+    // </speak>
 
     synthesizer.speakSsmlAsync(
       ssml,
